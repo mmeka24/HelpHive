@@ -1,53 +1,74 @@
 #imports
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from pymongo import MongoClient
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired, EqualTo
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(24)
 
-app.secret_key = "abcdefghijklmnopqrstuvwxyz"
-client = MongoClient('localhost', 27017)
+MONGO_URI = "mongodb+srv://laylashihab60:wjTBf97MWxJYKLlo@helphive.avdab.mongodb.net/?retryWrites=true&w=majority&appName=HelpHive"
 
-db = client.flask_db
-todos = db.todos
+client = MongoClient(MONGO_URI)
+db = client["HelpHive"]  # Replace <dbname> with the name of your database
+users_collection = db.loginInfo
 
-users_collection = db['users']
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
 
 @app.route('/', methods=['GET', 'POST'])
+def index():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        # Check if the user exists and verify password
+        user = users_collection.find_one({"username": username})
+        if user and check_password_hash(user['password'], password):
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password', 'danger')
+
+    return render_template('login.html', form=form)
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        hashed_password = generate_password_hash(password)
 
         # Check if the username already exists
-        if users_collection.find_one({'username': username}):
-            flash('Username already exists. Choose a different one.', 'danger')
-        else:
-            users_collection.insert_one({'username': username, 'password': password})
-            flash('Registration successful. You can now log in.', 'success')
-            return redirect(url_for('login'))
+        if users_collection.find_one({"username": username}):
+            flash('Username already exists', 'danger')
+            return redirect(url_for('register'))
 
-    return render_template('register.html')
+        # Insert the new user into the database
+        users_collection.insert_one({
+            "username": username,
+            "password": hashed_password
+        })
+        flash('Registration successful!', 'success')
+        return redirect(url_for('index'))
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    return render_template('register.html', form=form)
 
-        # Check if the username and password match
-        user = users_collection.find_one({'username': username, 'password': password})
-        if user:
-            flash('Login successful.', 'success')
-            # Add any additional logic, such as session management
-        else:
-            flash('Invalid username or password. Please try again.', 'danger')
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
-    return render_template('login.html')
-
-
-# main driver function
 if __name__ == '__main__':
-
-    # run() method of Flask class runs the application 
-    # on the local development server.
-    app.run()
+    app.run(debug=True)

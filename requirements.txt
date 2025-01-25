@@ -1,0 +1,5 @@
+Flask==2.2.2
+Flask-WTF==1.0.1
+pymongo==4.3.3
+werkzeug==2.2.2
+wtforms==3.0.1

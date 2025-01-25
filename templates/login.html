@@ -1,21 +1,39 @@
-{% extends 'layout.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
 
-{% block content %}
-  <h2>Login</h2>
-  {% with messages = get_flashed_messages() %}
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-          <li>{{ message }}</li>
+        <ul>
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
         {% endfor %}
-      </ul>
+        </ul>
     {% endif %}
-  {% endwith %}
-  <form method="post" action="{{ url_for('login') }}">
-    <label for="username">Username:</label>
-    <input type="text" name="username" required>
-    <label for="password">Password:</label>
-    <input type="password" name="password" required>
-    <button type="submit">Login</button>
-  </form>
-{% endblock %}
+    {% endwith %}
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            <label for="username">Username:</label>
+            {{ form.username() }}
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            {{ form.password() }}
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+</body>
+</html>
