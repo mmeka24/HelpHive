@@ -8,6 +8,10 @@ from wtforms import StringField, PasswordField, SelectField, RadioField
 from wtforms.validators import DataRequired, EqualTo
 from bson.objectid import ObjectId
 from datetime import datetime, timezone
+import requests
+
+import sys
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -42,9 +46,11 @@ class IncidentReportForm(FlaskForm):
                                                 ('5', 'Tornado'), 
                                                 ('6', 'Icy'), 
                                                 ('7', 'Available Resources')
-                                                ])
-    resources = RadioField("Resources Needed", choices=[('1', 'Yes'), ('2', 'No')])
-    severity = RadioField("Severity", choices=[('1', 'Low'), ('2', 'Medium'), ('3', 'High')])
+                                                ], 
+                                                validators=[DataRequired()])
+    resources = RadioField("Resources Needed", choices=[('1', 'Yes'), ('2', 'No')], validators=[DataRequired()])
+    severity = RadioField("Severity", choices=[('1', 'Low'), ('2', 'Medium'), ('3', 'High')], validators=[DataRequired()])
+    streetAddress = StringField('Street Address', validators=[DataRequired()])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -159,19 +165,34 @@ def incidentReport():
     currentUser = users_collection.find_one({"username": loggedInUser})
 
     if currentUser:
-        print(currentUser['_id'])
-
         if form.validate_on_submit():
             category = request.form['category']
             resources = request.form['resources']
             severity = request.form['severity']
             timestamp = datetime.now(timezone.utc)
 
+            # lat = 0
+            # lng = 0
+
+            result = is_valid_address(request.form['streetAddress'])
+            print(result,file=sys.stderr)
+            check = result[0]
+            lat = result[1]
+            lng = result[2]
+            if check:
+                address = request.form['streetAddress']
+            elif not check:
+                flash('Invalid Address', 'danger')
+                return redirect(url_for('incidentReport'))
+            
             report = {
                 "category": category,
                 "resources": resources,
                 "severity": severity,
-                "timestamp": timestamp
+                "timestamp": timestamp,
+                "address": address,
+                "lat":lat,
+                "lng":lng
             }
 
             reports_collection.insert_one(report)
@@ -179,6 +200,43 @@ def incidentReport():
             return redirect(url_for('incidentReport'))
 
     return render_template('incidentReport.html', form=form)
+
+def is_valid_address(address):
+    api_key = "8757fcae3af24a7e88298e5841a4ddaf"  
+    url = f"https://api.opencagedata.com/geocode/v1/json?q={address}&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
+
+    # Check if the API returned results
+    if data['results']:
+        # Get the first result
+        result = data['results'][0]
+
+        # Check confidence level (e.g., minimum threshold of 8)
+        confidence = result.get('confidence', 0)
+        components = result.get('components', {})
+
+        if confidence >= 3.5 and 'road' in components:
+            fulladdress = address + ", West Lafayette, IN, 47907"
+            lat,lng = get_geocode(fulladdress, api_key)
+            if (lng < -86.7014 and lng > -87.0067) and (lat > 40.3008 and lat < 40.5102):
+                return (True, lat, lng)
+    # No results indicate an invalid address
+    res = (False, 1,1)
+    print(res,file=sys.stderr)
+    return res
+
+def get_geocode(address, api_key):
+    url = f"https://api.opencagedata.com/geocode/v1/json?q={address}&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
+
+    if data['results']:
+        lat = data['results'][0]['geometry']['lat']
+        lng = data['results'][0]['geometry']['lng']
+        return lat, lng
+    else:
+        return 1, 1
 
 if __name__ == '__main__':
     app.run(debug=True)

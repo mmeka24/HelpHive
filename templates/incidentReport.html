@@ -10,8 +10,8 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
     <ul>
-    {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
+    {% for streetAddress, message in messages %}
+        <li class="{{ streetAddress }}">{{ message }}</li>
     {% endfor %}
     </ul>
 {% endif %}
@@ -37,6 +37,10 @@
             {% for subfield in form.severity %}
                 <label>{{ subfield }} {{subfield.label}}</label>
             {% endfor %}
+        </div>
+        <div>
+            {{ form.streetAddress.label }}
+            {{ form.streetAddress() }}
         </div>
         <div>
             <button type="submit">Report</button>
