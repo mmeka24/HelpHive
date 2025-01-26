@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crisis Form</title>
 </head>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <ul>
+    {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
 <body>
     <h2>Report an Incident</h2>
 
@@ -27,8 +39,9 @@
             {% endfor %}
         </div>
         <div>
-            <button type="submit"> <a href="{{ url_for('dashboard')}}">Report</button>
+            <button type="submit">Report</button>
         </div>
     </form>
+    <a href="{{ url_for('dashboard' )}}">Dashboard</a>
 </body>
 </html>

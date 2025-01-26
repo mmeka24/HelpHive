@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, RadioField
 from wtforms.validators import DataRequired, EqualTo
 from bson.objectid import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -91,13 +91,14 @@ def register():
             flash('Username already exists', 'danger')
             return redirect(url_for('register'))
 
+        global loggedInUser
+        loggedInUser = username
+
         # Insert the new user into the database
         users_collection.insert_one({
             "username": username,
             "password": hashed_password
         })
-        global loggedInUser
-        loggedInUser = username
 
         flash('Registration successful!', 'success')
         return redirect(url_for('dashboard'))
@@ -157,22 +158,25 @@ def incidentReport():
 
     currentUser = users_collection.find_one({"username": loggedInUser})
 
-    print(currentUser['_id'])
+    if currentUser:
+        print(currentUser['_id'])
 
-    if form.validate_on_submit():
-        category = request.form['category']
-        resources = request.form['resources']
-        severity = request.form['severity']
+        if form.validate_on_submit():
+            category = request.form['category']
+            resources = request.form['resources']
+            severity = request.form['severity']
+            timestamp = datetime.now(timezone.utc)
 
-        report = {
-            "category": category,
-            "resources": resources,
-            "severity": severity,
-            "timestamp": datetime.utcnow()
-        }
+            report = {
+                "category": category,
+                "resources": resources,
+                "severity": severity,
+                "timestamp": timestamp
+            }
 
-        reports_collection.insert_one(report)
-        flash("success!", 'success')
+            reports_collection.insert_one(report)
+            flash("Report Submitted!", 'success')
+            return redirect(url_for('incidentReport'))
 
     return render_template('incidentReport.html', form=form)
 
