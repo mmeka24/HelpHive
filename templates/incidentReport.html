@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crisis Form</title>
+</head>
+<body>
+    <h2>Report an Incident</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.category.label }}
+            {{ form.category() }}
+        </div>
+        <div>
+            {{ form.resources.label }}
+            {% for subfield in form.resources %}
+                <label>{{ subfield }} {{subfield.label}}</label>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.severity.label }}
+            {% for subfield in form.severity %}
+                <label>{{ subfield }} {{subfield.label}}</label>
+            {% endfor %}
+        </div>
+        <div>
+            <button type="submit"> <a href="{{ url_for('dashboard')}}">Report</button>
+        </div>
+    </form>
+</body>
+</html>

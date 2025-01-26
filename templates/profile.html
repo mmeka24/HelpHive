@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Profile</title>
 </head>
-<body>
-    <h2>Login</h2>
 
-    <!-- Displays Flash Messages -->
+
+    <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <ul>
@@ -18,22 +17,28 @@
         </ul>
     {% endif %}
     {% endwith %}
-    
+
+
+<body>
+    <h2>Profile Information</h2>
     <form method="POST">
         {{ form.hidden_tag() }}
         <div>
-            <label for="username">Username:</label>
+            <label for="username">Change Username:</label>
             {{ form.username() }}
         </div>
         <div>
-            <label for="password">Password:</label>
+            <label for="password">Change Password:</label>
             {{ form.password() }}
         </div>
         <div>
-            <button type="submit">Login</button>
+            <label for="confirm_password">Confirm Password:</label>
+            {{ form.confirm_password() }}
+        </div>
+        <div>
+            <button type="submit">Save Changes</button>
         </div>
     </form>
-
-    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
-</body>
+    <h2>Reports</h2>
+<body>
 </html>
