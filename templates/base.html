@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>{% block title %}Help Hive{% endblock %}</title>
+   <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+   <!-- Sidebar -->
+   <div class="sidebar">
+       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+       <ul>
+           <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+           <li><a href="{{ url_for('incidentReport') }}">Report Incident</a></li>
+           <li><a href="{{ url_for('userReports') }}">My Reports</a></li>
+           <li><a href="{{ url_for('profile') }}">Profile Page</a></li>
+           <li><a href="{{ url_for('index') }}">Logout</a></li>
+       </ul>
+   </div>
+
+
+   <!-- Main Content -->
+   <div class="main-content">
+       {% block content %}
+       {% endblock %}
+   </div>
+
+
+   <script>
+       function toggleSidebar() {
+           document.querySelector('.sidebar').classList.toggle('open');
+           document.querySelector('.main-content').classList.toggle('shrink');
+       }
+   </script>
+</body>
+</html>
+
+

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Map</title>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet/dist/leaflet.css"
@@ -14,91 +15,187 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
   />
-  <style>
-    #map {
-      height: 75vh;
-    }
+   <style>
+       /* Sidebar Styling */
+       .sidebar {
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 250px;
+           height: 100%;
+           background-color: #333;
+           color: #fff;
+           overflow: auto;
+           transform: translateX(0);
+           transition: transform 0.3s ease-in-out;
+           z-index: 2;
+       }
+
+
+       .sidebar.open {
+           transform: translateX(-250px); /* Hide the sidebar */
+       }
+
+
+       .sidebar .menu-toggle {
+           background: none;
+           border: none;
+           color: #fff;
+           font-size: 1.5em;
+           cursor: pointer;
+           margin: 10px;
+       }
+
+
+       .sidebar ul {
+        list-style: none;
+           padding: 0;
+           margin: 20px 0;
+       }
+
+
+       .sidebar ul li {
+           margin: 15px 0;
+       }
+
+
+       .sidebar ul li a {
+           color: #fff;
+           text-decoration: none;
+           padding: 10px 20px;
+           display: block;
+       }
+
+
+       .sidebar ul li a:hover {
+           background-color: #575757;
+       }
+
+
+       /* Main Content Styling */
+       .main-content {
+           margin-left: 250px;
+           transition: margin-left 0.3s ease-in-out;
+       }
+
+
+       .main-content.shrink {
+           margin-left: 0;
+       }
+
+
+       /* Map Styling */
+       #map {
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           z-index: 0; /* Ensure map stays behind */
+       }
   </style>
 </head>
 <body>
-    <div id="map"></div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
+    <!-- Sidebar -->
+   <div class="sidebar">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('incidentReport') }}">Report Incident</a></li>
+            <li><a href="{{ url_for('userReports') }}">My Reports</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile Page</a></li>
+            <li><a href="{{ url_for('index') }}">Logout</a></li>
+        </ul>
+    </div>
 
-        const map = L.map("map").setView([40.4259, -86.9081], 13);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-        var locations_json_string = {{ locations_json | tojson | safe }};
-        var locations = eval(locations_json_string);  // Use eval to parse the string into an array
-        console.log(locations);  // Check if the locations are correctly parsed
-
-        // Loop through the locations array
-        locations.forEach(function(location) {
-            console.log(location.lat, location.lng);
-
-            category = location.category;
-            resources = location.resources;
-            severity = location.severity;
-            address = location.address;
-            lat = location.lat;
-            lng = location.lng;
-
-            if (category == "1") {
-                category = "Snowstorm";
-            } else if (category == "2") {
-                category = "Fire";
-            } else if (category == "3") {
-                category = "Drought";
-            } else if (category == "4") {
-                category = "Accident";
-            } else if (category == "5") {
-                category = "Tornado";
-            } else if (category == "6") {
-                category = "Icy";
-            } else if (category == "7") {
-                category = "Available Resources";
+    <div class="main-content">
+        <header>
+            <h1> West Lafayette Crisis Aversion </h1>
+        </header>
+        <div id="map"></div>
+    </div>
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script>
+            function toggleSidebar() {
+                document.querySelector('.sidebar').classList.toggle('open');
+                document.querySelector('.main-content').classList.toggle('shrink');
             }
 
-            if (resources == "1") {
-                resources = "Yes";
-            } else if (resource == "2") {
-                resources = "No";
-            }
 
-            if (severity == "1") {
-                severity = "Low"
-            } else if (severity == "2") {
-                severity = "Medium"
-            } else if (severity == "3") {
-                severity = "High"
-            }
+            const map = L.map("map").setView([40.4259, -86.9081], 13);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-            popup = L.popup()
-             .setLatLng([lat, lng])
-             .setContent("Category: " + category + "\<br> Resources: " + resources + "\<br> Severity: " + severity + "\<br> Address: " + address)
-             .addTo(map);
-        });
+            var locations_json_string = {{ locations_json | tojson | safe }};
+            var locations = eval(locations_json_string);  // Use eval to parse the string into an array
+            console.log(locations);  // Check if the locations are correctly parsed
 
-        // console.log(locations)
-        // const obj = JSON.parse(locations);
-        // console.log(obj.lat);
+            // Loop through the locations array
+            locations.forEach(function(location) {
+                console.log(location.lat, location.lng);
 
-        // locations.forEach(function(location) {
-        //     console.log("af;ieawhjfpoi")
-        //     var category = location.category;
-        //     var resources = location.resources;
-        //     var severity = location.severity;
-        //     var address = location.address;
-        //     var lat = location.lat;
-        //     var lng = location.lng;
+                category = location.category;
+                resources = location.resources;
+                severity = location.severity;
+                address = location.address;
+                lat = location.lat;
+                lng = location.lng;
 
-        //     console.log("Lat: ", lat, "Lng: ", lng);
+                if (category == "1") {
+                    category = "Snowstorm";
+                } else if (category == "2") {
+                    category = "Fire";
+                } else if (category == "3") {
+                    category = "Drought";
+                } else if (category == "4") {
+                    category = "Accident";
+                } else if (category == "5") {
+                    category = "Tornado";
+                } else if (category == "6") {
+                    category = "Icy";
+                } else if (category == "7") {
+                    category = "Available Resources";
+                }
 
-        //     var popup = L.popup()
-        //     .setLatLng([lat, lng])
-        //     .setContent("AHHHHHHHHHH")
-        //     .openOn(map);
-        // });
-    </script>
+                if (resources == "1") {
+                    resources = "Yes";
+                } else if (resource == "2") {
+                    resources = "No";
+                }
+
+                if (severity == "1") {
+                    severity = "Low"
+                } else if (severity == "2") {
+                    severity = "Medium"
+                } else if (severity == "3") {
+                    severity = "High"
+                }
+
+                popup = L.popup()
+                .setLatLng([lat, lng])
+                .setContent("Category: " + category + "\<br> Resources: " + resources + "\<br> Severity: " + severity + "\<br> Address: " + address)
+                .addTo(map);
+            });
+
+            // console.log(locations)
+            // const obj = JSON.parse(locations);
+            // console.log(obj.lat);
+
+            // locations.forEach(function(location) {
+            //     console.log("af;ieawhjfpoi")
+            //     var category = location.category;
+            //     var resources = location.resources;
+            //     var severity = location.severity;
+            //     var address = location.address;
+            //     var lat = location.lat;
+            //     var lng = location.lng;
+
+            //     console.log("Lat: ", lat, "Lng: ", lng);
+
+            //     var popup = L.popup()
+            //     .setLatLng([lat, lng])
+            //     .setContent("AHHHHHHHHHH")
+            //     .openOn(map);
+            // });
+        </script>
 </body>
 </html>
