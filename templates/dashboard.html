@@ -21,18 +21,6 @@
   </style>
 </head>
 <body>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
-
-    <h1>West Lafayette Crisis Aversion</h1>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
@@ -112,13 +100,5 @@
         //     .openOn(map);
         // });
     </script>
-
-    <a href="{{ url_for('incidentReport' )}}">Report an Incident</a>
-    <br>
-    <a href="{{ url_for('userReports' )}}">My Reports</a>
-    <br>
-    <a href="{{ url_for('profile') }}">Profile Page</a>
-    <br>
-    <a href="{{ url_for('index') }}">Logout</a>
-    </body>
+</body>
 </html>
