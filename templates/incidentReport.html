@@ -1,3 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Report Incident{% endblock %}
+
+{% block content %}
+<h2>Report an Incident</h2>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div>
+    {{ form.category.label }} {{ form.category() }}
+  </div>
+  <div>
+    {{ form.resources.label }}
+    {% for subfield in form.resources %}
+      <label>{{ subfield }} {{ subfield.label }}</label>
+    {% endfor %}
+  </div>
+  <div>
+    {{ form.severity.label }}
+    {% for subfield in form.severity %}
+      <label>{{ subfield }} {{ subfield.label }}</label>
+    {% endfor %}
+  </div>
+  <div>
+    {{ form.streetAddress.label }} {{ form.streetAddress() }}
+  </div>
+  <button type="submit">Report</button>
+</form>
+{% endblock %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

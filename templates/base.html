@@ -1,39 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>{% block title %}Help Hive{% endblock %}</title>
-   <link rel="stylesheet" href="/static/css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Help Hive{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #333;
+      color: #fff;
+      overflow: auto;
+      z-index: 2;
+    }
+
+    .sidebar .menu-toggle {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5em;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .sidebar ul li {
+      margin: 15px 0;
+    }
+
+    .sidebar ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: block;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #575757;
+    }
+
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-   <!-- Sidebar -->
-   <div class="sidebar">
-       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-       <ul>
-           <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-           <li><a href="{{ url_for('incidentReport') }}">Report Incident</a></li>
-           <li><a href="{{ url_for('userReports') }}">My Reports</a></li>
-           <li><a href="{{ url_for('profile') }}">Profile Page</a></li>
-           <li><a href="{{ url_for('index') }}">Logout</a></li>
-       </ul>
-   </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('incidentReport') }}">Report Incident</a></li>
+      <li><a href="{{ url_for('userReports') }}">My Reports</a></li>
+      <li><a href="{{ url_for('profile') }}">Profile Page</a></li>
+      <li><a href="{{ url_for('index') }}">Logout</a></li>
+    </ul>
+  </div>
 
-
-   <!-- Main Content -->
-   <div class="main-content">
-       {% block content %}
-       {% endblock %}
-   </div>
-
-
-   <script>
-       function toggleSidebar() {
-           document.querySelector('.sidebar').classList.toggle('open');
-           document.querySelector('.main-content').classList.toggle('shrink');
-       }
-   </script>
+  <!-- Main Content -->
+  <div class="main-content">
+    {% block content %}{% endblock %}
+  </div>
 </body>
 </html>
-
-

@@ -1,37 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Reports</title>      
-</head>
+{% extends "base.html" %}
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul>
-        {% for report, message in messages %}
-            <li class="{{ report }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
+{% block title %}My Reports{% endblock %}
 
-<body>
-    <h2>My Reports</h2>
-    <div>  
-        <form method="POST">
-            {{ form.hidden_tag() }}
-            <div>
-                {{ form.report.label }}
-                {{ form.report() }}
-            </div>
-            <div>
-                <button type="submit">Delete Report</button>
-            </div>
-        </form>
-     </div>
-    <a href="{{ url_for('dashboard' )}}">Dashboard</a>
-<body>
-</html>
+{% block content %}
+<h2>My Reports</h2>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul>
+  {% for category, message in messages %}
+  <li class="{{ category }}">{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<!-- Reports List -->
+<ul>
+  {% for report in reports %}
+  <li>
+    {{ report.category }} - {{ report.address }}
+    (<a href="{{ url_for('delete_report', report_id=report.id) }}">Delete</a>)
+  </li>
+  {% endfor %}
+</ul>
+
+<!-- Delete Report Form -->
+<div>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+      {{ form.report.label }}
+      {{ form.report() }}
+    </div>
+    <div>
+      <button type="submit">Delete Report</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
