@@ -1,6 +1,7 @@
 # HelpHive
 ## **InnovateHer Hackathon**
 **Team Members**: Anu, Colleen, Manasvi, Layla
+
 <img src="https://github.com/user-attachments/assets/aafec10a-ec71-4434-b4bc-d0d53748c60e" alt="logo" width="300">
 
 
