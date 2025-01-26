@@ -165,7 +165,6 @@ def incidentReport():
         severity = request.form['severity']
 
         report = {
-            "user-id": ObjectId(currentUser['_id']),
             "category": category,
             "resources": resources,
             "severity": severity,
