@@ -1,6 +1,6 @@
 #imports
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf import FlaskForm
@@ -24,8 +24,6 @@ client = MongoClient(MONGO_URI)
 db = client["HelpHive"]
 users_collection = db.loginInfo
 reports_collection = db.reports
-
-loggedInUser = ""
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -51,11 +49,13 @@ class IncidentReportForm(FlaskForm):
     resources = RadioField("Resources Needed", choices=[('1', 'Yes'), ('2', 'No')], validators=[DataRequired()])
     severity = RadioField("Severity", choices=[('1', 'Low'), ('2', 'Medium'), ('3', 'High')], validators=[DataRequired()])
     streetAddress = StringField('Street Address', validators=[DataRequired()])
+class DeleteReport(FlaskForm):
+    report = SelectField("Report",validators=[DataRequired()])
+    
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = LoginForm()
-
 
     if form.validate_on_submit():
         username = form.username.data
@@ -67,9 +67,8 @@ def index():
         if user and check_password_hash(user['password'], password):
 
 
-            #if the login is successful, stores username as a global variage
-            global loggedInUser
-            loggedInUser = username
+            #if the login is successful, stores username 
+            session['loggedInUser'] = username
 
 
             flash('Login successful!', 'success')
@@ -85,7 +84,6 @@ def index():
 def register():
     form = RegistrationForm()
 
-
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
@@ -97,8 +95,7 @@ def register():
             flash('Username already exists', 'danger')
             return redirect(url_for('register'))
 
-        global loggedInUser
-        loggedInUser = username
+        session['loggedInUser'] = username
 
         # Insert the new user into the database
         users_collection.insert_one({
@@ -117,6 +114,54 @@ def register():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/userReports', methods=["GET", "POST"])
+def userReports():
+    form = DeleteReport()
+
+    loggedInUser = session.get('loggedInUser')
+
+    if loggedInUser:
+
+        # finds user's report documents
+        loggedInUser = session.get('loggedInUser')
+        reports_docs = reports_collection.find({"username":loggedInUser}) 
+
+        docs_list = []
+        #iterates through report documents
+        for doc in reports_docs: 
+            docs_list.append(doc)
+        
+        reports = docs_list
+
+        CATEGORY_MAPPING = {
+            '1': 'Snowstorm',
+            '2': 'Fire',
+            '3': 'Drought',
+            '4': 'Accident',
+            '5': 'Tornado',
+            '6': 'Icy',
+            '7': 'Available Resources'
+        }
+
+        choiceList = {}
+
+        # translates all categories into words 
+        count = 1
+        for report in reports:
+            report['category'] = CATEGORY_MAPPING[report['category']]
+            choiceList[report["_id"]] = str(count) + ":\t" + str(report["category"]) + ":\t" + str(report["address"]) 
+            count += 1
+        
+        form.report.choices = [(key, value) for key, value in choiceList.items()]
+
+        if form.validate_on_submit():
+            toDeleteValue = request.form['report']  # Get the selected report
+            reports_collection.delete_one({"_id": ObjectId(toDeleteValue)})  # Use `toDelete` to delete
+            flash('Report Deleted!', 'success')
+            return redirect(url_for('userReports'))
+
+                
+    return render_template('userReports.html', form =form)
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
@@ -160,22 +205,16 @@ def profile():
 def incidentReport():
     form = IncidentReportForm()
 
-    global loggedInUser
+    loggedInUser = session.get('loggedInUser')
 
-    currentUser = users_collection.find_one({"username": loggedInUser})
-
-    if currentUser:
+    if loggedInUser:
         if form.validate_on_submit():
             category = request.form['category']
             resources = request.form['resources']
             severity = request.form['severity']
             timestamp = datetime.now(timezone.utc)
 
-            # lat = 0
-            # lng = 0
-
             result = is_valid_address(request.form['streetAddress'])
-            print(result,file=sys.stderr)
             check = result[0]
             lat = result[1]
             lng = result[2]
@@ -186,6 +225,7 @@ def incidentReport():
                 return redirect(url_for('incidentReport'))
             
             report = {
+                "username":loggedInUser,
                 "category": category,
                 "resources": resources,
                 "severity": severity,
@@ -223,7 +263,6 @@ def is_valid_address(address):
                 return (True, lat, lng)
     # No results indicate an invalid address
     res = (False, 1,1)
-    print(res,file=sys.stderr)
     return res
 
 def get_geocode(address, api_key):

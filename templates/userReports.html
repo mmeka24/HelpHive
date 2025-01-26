@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reports</title>      
+</head>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul>
+        {% for report, message in messages %}
+            <li class="{{ report }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+
+<body>
+    <h2>My Reports</h2>
+    <div>  
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.report.label }}
+                {{ form.report() }}
+            </div>
+            <div>
+                <button type="submit">Delete Report</button>
+            </div>
+        </form>
+     </div>
+    <a href="{{ url_for('dashboard' )}}">Dashboard</a>
+<body>
+</html>
