@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
+  />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
 </head>
 <body>
 
@@ -17,8 +32,60 @@
     {% endif %}
     {% endwith %}
 
-    <h1>Welcome to your dashboard!</h1>
-    <p>Here is your personal information.</p>
+    <h1>West Lafayette Crisis Aversion</h1>
+    <div id="map"></div>
+        <script>
+        const map = L.map("map").setView([40.4259, -86.9081], 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+        async function fetchDisasters() {
+            const response = await fetch("http://localhost:5000/api/disasters");
+            const data = await response.json();
+            const markers = L.markerClusterGroup();
+
+            data.forEach((disaster) => {
+            const { location, type, timestamp } = disaster;
+
+            const icon = L.icon({
+                iconUrl: getIcon(type),
+                iconSize: [30, 40],
+                iconAnchor: [15, 40],
+            });
+
+            const marker = L.marker([location.lat, location.lng], { icon });
+            marker.bindPopup(
+                `<strong>Type:</strong> ${type}<br><strong>Timestamp:</strong> ${new Date(
+                timestamp
+                ).toLocaleString()}`
+            );
+            markers.addLayer(marker);
+            });
+
+            map.addLayer(markers);
+        }
+
+        function getIcon(type) {
+            switch (type) {
+            case "Snowstorm":
+                return "static/icons/snowstorm-icon.png";
+            case "Fire":
+                return "static/icons/fire-icon.png";
+            case "Droughts":
+                return "static/icons/drought-icon.png";  
+            case "Accidents":
+                return "static/icons/accidents-icon.png"; 
+            case "Tornadoes":
+                return "static/icons/tornadoes-icon.png"; 
+            case "Available Resources":
+                return "static/icons/available-resources-icon.png";
+            default:
+                return "static/icons/default-icon.png";
+            }
+        }
+
+        fetchDisasters();
+        </script>
+
     <a href="{{ url_for('incidentReport' )}}">Report an Incident</a>
     <br>
     <a href="{{ url_for('userReports' )}}">My Reports</a>
@@ -26,5 +93,5 @@
     <a href="{{ url_for('profile') }}">Profile Page</a>
     <br>
     <a href="{{ url_for('index') }}">Logout</a>
-</body>
+    </body>
 </html>
