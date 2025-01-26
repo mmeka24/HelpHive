@@ -16,7 +16,7 @@
   />
   <style>
     #map {
-      height: 100vh;
+      height: 75vh;
     }
   </style>
 </head>
@@ -34,57 +34,84 @@
 
     <h1>West Lafayette Crisis Aversion</h1>
     <div id="map"></div>
-        <script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+
         const map = L.map("map").setView([40.4259, -86.9081], 13);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-        async function fetchDisasters() {
-            const response = await fetch("http://localhost:5000/api/disasters");
-            const data = await response.json();
-            const markers = L.markerClusterGroup();
+        var locations_json_string = {{ locations_json | tojson | safe }};
+        var locations = eval(locations_json_string);  // Use eval to parse the string into an array
+        console.log(locations);  // Check if the locations are correctly parsed
 
-            data.forEach((disaster) => {
-            const { location, type, timestamp } = disaster;
+        // Loop through the locations array
+        locations.forEach(function(location) {
+            console.log(location.lat, location.lng);
 
-            const icon = L.icon({
-                iconUrl: getIcon(type),
-                iconSize: [30, 40],
-                iconAnchor: [15, 40],
-            });
+            category = location.category;
+            resources = location.resources;
+            severity = location.severity;
+            address = location.address;
+            lat = location.lat;
+            lng = location.lng;
 
-            const marker = L.marker([location.lat, location.lng], { icon });
-            marker.bindPopup(
-                `<strong>Type:</strong> ${type}<br><strong>Timestamp:</strong> ${new Date(
-                timestamp
-                ).toLocaleString()}`
-            );
-            markers.addLayer(marker);
-            });
-
-            map.addLayer(markers);
-        }
-
-        function getIcon(type) {
-            switch (type) {
-            case "Snowstorm":
-                return "static/icons/snowstorm-icon.png";
-            case "Fire":
-                return "static/icons/fire-icon.png";
-            case "Droughts":
-                return "static/icons/drought-icon.png";  
-            case "Accidents":
-                return "static/icons/accidents-icon.png"; 
-            case "Tornadoes":
-                return "static/icons/tornadoes-icon.png"; 
-            case "Available Resources":
-                return "static/icons/available-resources-icon.png";
-            default:
-                return "static/icons/default-icon.png";
+            if (category == "1") {
+                category = "Snowstorm";
+            } else if (category == "2") {
+                category = "Fire";
+            } else if (category == "3") {
+                category = "Drought";
+            } else if (category == "4") {
+                category = "Accident";
+            } else if (category == "5") {
+                category = "Tornado";
+            } else if (category == "6") {
+                category = "Icy";
+            } else if (category == "7") {
+                category = "Available Resources";
             }
-        }
 
-        fetchDisasters();
-        </script>
+            if (resources == "1") {
+                resources = "Yes";
+            } else if (resource == "2") {
+                resources = "No";
+            }
+
+            if (severity == "1") {
+                severity = "Low"
+            } else if (severity == "2") {
+                severity = "Medium"
+            } else if (severity == "3") {
+                severity = "High"
+            }
+
+            popup = L.popup()
+             .setLatLng([lat, lng])
+             .setContent("Category: " + category + "\<br> Resources: " + resources + "\<br> Severity: " + severity + "\<br> Address: " + address)
+             .addTo(map);
+        });
+
+        // console.log(locations)
+        // const obj = JSON.parse(locations);
+        // console.log(obj.lat);
+
+        // locations.forEach(function(location) {
+        //     console.log("af;ieawhjfpoi")
+        //     var category = location.category;
+        //     var resources = location.resources;
+        //     var severity = location.severity;
+        //     var address = location.address;
+        //     var lat = location.lat;
+        //     var lng = location.lng;
+
+        //     console.log("Lat: ", lat, "Lng: ", lng);
+
+        //     var popup = L.popup()
+        //     .setLatLng([lat, lng])
+        //     .setContent("AHHHHHHHHHH")
+        //     .openOn(map);
+        // });
+    </script>
 
     <a href="{{ url_for('incidentReport' )}}">Report an Incident</a>
     <br>

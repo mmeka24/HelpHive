@@ -9,6 +9,7 @@ from wtforms.validators import DataRequired, EqualTo
 from bson.objectid import ObjectId
 from datetime import datetime, timezone
 import requests
+import json
 
 import sys
 
@@ -110,9 +111,31 @@ def register():
     return render_template('register.html', form=form)
 
 
+def escape_special_chars(value):
+    if isinstance(value, str):
+        return value.replace('"', '\\"').replace("'", "\\'")
+    return value
+
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    locations = reports_collection.find()
+    location_data = []
+    for location in locations:
+        location_info = {
+            "category": escape_special_chars(location.get('category')),
+            "resources": escape_special_chars(location.get('resources')),
+            "severity": escape_special_chars(location.get("severity")),
+            "address": escape_special_chars(location.get("address")),
+            "lat": escape_special_chars(location.get("lat")),
+            "lng": escape_special_chars(location.get("lng")),
+        }
+        location_data.append(location_info)
+    
+    locations_json = json.dumps(location_data)
+
+    print(locations_json, file=sys.stderr)
+
+    return render_template('dashboard.html', locations_json=locations_json)
 
 @app.route('/userReports', methods=["GET", "POST"])
 def userReports():
