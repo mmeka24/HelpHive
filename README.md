@@ -1,9 +1,8 @@
 # HelpHive
-
-<img src="https://github.com/user-attachments/assets/aafec10a-ec71-4434-b4bc-d0d53748c60e" alt="logo" width="200">
-
 ## **InnovateHer Hackathon**
 **Team Members**: Anu, Colleen, Manasvi, Layla
+<img src="https://github.com/user-attachments/assets/aafec10a-ec71-4434-b4bc-d0d53748c60e" alt="logo" width="300">
+
 
 ## Inspiration
 Natural disasters can create overwhelming chaos, often due to fragmented and disorganized information. People affected by disasters often struggle to find timely, localized updates or coordinate resources effectively. HelpHive was inspired by the need for a centralized, user-friendly platform where community members can work together to report, visualize, and respond to emergencies in real time. Our mission is to reduce confusion and improve response efficiency, allowing users to focus on what truly matters during these critical moments.
