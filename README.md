@@ -1,5 +1,10 @@
 # HelpHive
-InnovateHer Hackathon - Anu, Colleen, Manasvi, Layla
+
+![logo](https://github.com/user-attachments/assets/aafec10a-ec71-4434-b4bc-d0d53748c60e)
+
+## **InnovateHer Hackathon**
+**Team Members**: Anu, Colleen, Manasvi, Layla
+
 ## Inspiration
 Natural disasters can create overwhelming chaos, often due to fragmented and disorganized information. People affected by disasters often struggle to find timely, localized updates or coordinate resources effectively. HelpHive was inspired by the need for a centralized, user-friendly platform where community members can work together to report, visualize, and respond to emergencies in real time. Our mission is to reduce confusion and improve response efficiency, allowing users to focus on what truly matters during these critical moments.
 
@@ -7,7 +12,8 @@ Natural disasters can create overwhelming chaos, often due to fragmented and dis
 ## What it does
 HelpHive is a community-based platform designed to streamline communication and collaboration during natural disasters and emergencies.
 
-1. User Accounts: Users can create an account with a secure username and password. Once logged in, users have access to features such as editing their profile, submitting reports, and managing previously submitted reports.
+1. User Accounts: Users can create an account with a secure username and password. Once logged in, users have access to features such as editing their profile, submitting reports, and managing previously submitted repor![Uploading logo.png…]()
+ts.
 
 2. Disaster Reporting: Users can report emergencies by filling out a simple form. Reports include critical information such as:
 
