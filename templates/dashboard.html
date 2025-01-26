@@ -1,97 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Map</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
-  />
-  <style>
-    #map {
-      height: 100vh;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lafayette and West Lafayette Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <style>
+        #map { height: 80vh; width: 80%; }
+    </style>
+
 </head>
 <body>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
-
-    <h1>West Lafayette Crisis Aversion</h1>
     <div id="map"></div>
-        <script>
-        const map = L.map("map").setView([40.4259, -86.9081], 13);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-        async function fetchDisasters() {
-            const response = await fetch("http://localhost:5000/api/disasters");
-            const data = await response.json();
-            const markers = L.markerClusterGroup();
+    <script>
 
-            data.forEach((disaster) => {
-            const { location, type, timestamp } = disaster;
+        // Center the map on Lafayette and West Lafayette
+        const map = L.map('map').setView([40.4167, -86.8754], 12);
 
-            const icon = L.icon({
-                iconUrl: getIcon(type),
-                iconSize: [30, 40],
-                iconAnchor: [15, 40],
-            });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-            const marker = L.marker([location.lat, location.lng], { icon });
-            marker.bindPopup(
-                `<strong>Type:</strong> ${type}<br><strong>Timestamp:</strong> ${new Date(
-                timestamp
-                ).toLocaleString()}`
-            );
-            markers.addLayer(marker);
-            });
+        var defaultIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
 
-            map.addLayer(markers);
-        }
+        L.marker([40.4245, -86.9112], {
+            title: "PMU",
+            icon: defaultIcon
+        })
+        .bindPopup('<h3> PMU </h3>')
+        .addTo(map)
 
-        function getIcon(type) {
-            switch (type) {
-            case "Snowstorm":
-                return "static/icons/snowstorm-icon.png";
-            case "Fire":
-                return "static/icons/fire-icon.png";
-            case "Droughts":
-                return "static/icons/drought-icon.png";  
-            case "Accidents":
-                return "static/icons/accidents-icon.png"; 
-            case "Tornadoes":
-                return "static/icons/tornadoes-icon.png"; 
-            case "Available Resources":
-                return "static/icons/available-resources-icon.png";
-            default:
-                return "static/icons/default-icon.png";
-            }
-        }
+      
 
-        fetchDisasters();
-        </script>
 
-    <a href="{{ url_for('incidentReport' )}}">Report an Incident</a>
-    <br>
-    <a href="{{ url_for('userReports' )}}">My Reports</a>
-    <br>
-    <a href="{{ url_for('profile') }}">Profile Page</a>
-    <br>
-    <a href="{{ url_for('index') }}">Logout</a>
-    </body>
+        // Fetch markers from your API
+    //     fetch('http://localhost:3000/api/markers') // Replace with your actual API endpoint
+    //         .then(response => response.json())
+    //         .then(markers => {
+    //             markers.forEach((marker) => {
+    //                 L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon(marker.type) })
+    //                     .addTo(map)
+    //                     .bindPopup(`
+    //                         <h3>${disasterTypeMap[marker.type] || 'Unknown'}</h3>
+    //                         <p>Severity: ${marker.severity}</p>
+    //                         <p>Resources Needed: ${marker.resourcesNeeded ? 'Yes' : 'No'}</p>
+    //                         <p>Location: ${marker.location}</p>
+    //                         <p>Timestamp: ${new Date(marker.timestamp).toLocaleString()}</p>
+    //                     `);
+    //             });
+    //         })
+    //         .catch(error => console.error('Error fetching markers:', error));
+    // });
+
+    </script>
+</body>
 </html>
