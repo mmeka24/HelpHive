@@ -1,5 +1,5 @@
 # HelpHive
-InnovateHer Hackathon
+InnovateHer Hackathon - Anu, Colleen, Manasvi, Layla
 ## Inspiration
 Natural disasters can create overwhelming chaos, often due to fragmented and disorganized information. People affected by disasters often struggle to find timely, localized updates or coordinate resources effectively. HelpHive was inspired by the need for a centralized, user-friendly platform where community members can work together to report, visualize, and respond to emergencies in real time. Our mission is to reduce confusion and improve response efficiency, allowing users to focus on what truly matters during these critical moments.
 
