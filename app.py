@@ -196,7 +196,7 @@ def profile():
         password = form.password.data
 
         # finds user document
-        global loggedInUser
+        loggedInUser = session.get('loggedInUser')
         document = users_collection.find_one({"username": loggedInUser})
 
         if document:
