@@ -8,7 +8,7 @@
     <style>
         /* Center content styling */
         body {
-            background-color: #d3bc67; /* Light background */
+            background-color: #d3bc67; 
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -26,7 +26,7 @@
         }
 
         .logo {
-            width: 250px;
+            width: 150px;
             height: auto;
             margin-bottom: 20px;
         }
@@ -56,6 +56,17 @@
         button:hover {
             background-color: #45a049;
         }
+
+        .register-link {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -79,6 +90,9 @@
                 <button type="submit">Login</button>
             </div>
         </form>
+
+        <!-- Register Button -->
+        <a href="{{ url_for('register') }}" class="register-link">Don't have an account? Register here</a>
     </div>
 </body>
 </html>
